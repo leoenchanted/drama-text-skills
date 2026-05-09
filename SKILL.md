@@ -15,13 +15,13 @@ metadata:
 1. **短剧字幕文件**（.txt 格式）
 
 爆款文案模板读取逻辑：
-- **优先读取** `./templates/` 文件夹下的所有模板文件
-- 如果 `./templates/` 为空，提醒用户先把爆款文案模板放入该文件夹，或者直接粘贴模板内容
+- **优先读取** `.claude/skills/drama-text-skills/templates/` 文件夹下的所有模板文件
+- 如果 `.claude/skills/drama-text-skills/templates/` 为空，提醒用户先把爆款文案模板放入该文件夹，或者直接粘贴模板内容
 - 用户也可以临时提供额外模板，会与 templates 文件夹中的模板合并使用
 
 ## 模板文件夹
 
-`./templates/` — 放入约 8-10 篇爆款文案（.txt 或 .md），Skill 触发时自动读取全部文件作为风格参考。
+`.claude/skills/drama-text-skills/templates/` — 放入约 8-10 篇爆款文案（.txt 或 .md），Skill 触发时自动读取全部文件作为风格参考。
 
 ---
 
@@ -44,9 +44,9 @@ metadata:
 
 #### Step 2 — 分析爆款文案模板
 
-- **先检查 `./templates/` 文件夹**，读取其中所有模板文件（.txt / .md）
+- **先检查 `.claude/skills/drama-text-skills/templates/` 文件夹**，读取其中所有模板文件（.txt / .md）
 - 如果用户对话中额外提供了模板内容，一并纳入分析
-- 如果 `./templates/` 为空且用户未提供模板，提醒用户放入模板后再继续
+- 如果 `.claude/skills/drama-text-skills/templates/` 为空且用户未提供模板，提醒用户放入模板后再继续
 - 通读所有模板后，提炼共性特征，包括但不限于：
   - **开头钩子**：用什么方式抓人？（悬念提问 / 冲突预告 / 反转让步 / 情绪共鸣）
   - **叙事节奏**：短句还是长句？几句话一个转折？
