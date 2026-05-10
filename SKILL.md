@@ -14,14 +14,20 @@ metadata:
 用户需要提供：
 1. **短剧字幕文件**（.txt 格式）
 
-爆款文案模板读取逻辑：
-- **优先读取** `.claude/skills/drama-text-skills/templates/` 文件夹下的所有模板文件
-- 如果 `.claude/skills/drama-text-skills/templates/` 为空，提醒用户先把爆款文案模板放入该文件夹，或者直接粘贴模板内容
-- 用户也可以临时提供额外模板，会与 templates 文件夹中的模板合并使用
+## 模板文件夹（重要）
 
-## 模板文件夹
+模板文件夹位于**本 SKILL.md 文件所在目录下的 `templates/` 子文件夹**。
 
-`.claude/skills/drama-text-skills/templates/` — 放入约 8-10 篇爆款文案（.txt 或 .md），Skill 触发时自动读取全部文件作为风格参考。
+查找步骤：
+1. 本 SKILL.md 位于 `.claude/skills/drama-text-skills/SKILL.md`
+2. 模板文件夹就在同目录：`.claude/skills/drama-text-skills/templates/`
+3. 先用 `ls .claude/skills/drama-text-skills/templates/` 确认目录存在
+4. 如果报「目录不存在」或「无法访问」，说明 CWD 不是项目根目录。此时用 `find . -path "*/drama-text-skills/templates" -type d` 定位实际路径，然后读取
+5. 读取其中所有模板文件（.txt / .md）
+6. 如果模板文件夹为空，提醒用户先把爆款文案模板放入
+7. 用户也可以临时额外粘贴模板内容，会与文件夹中的模板合并使用
+
+放入约 8-10 篇爆款文案（.txt 或 .md），Skill 触发时自动读取全部文件作为风格参考。
 
 ---
 
@@ -44,9 +50,9 @@ metadata:
 
 #### Step 2 — 分析爆款文案模板
 
-- **先检查 `.claude/skills/drama-text-skills/templates/` 文件夹**，读取其中所有模板文件（.txt / .md）
+- **按上面「模板文件夹」章节的步骤**，定位并读取 `templates/` 中的所有模板文件（.txt / .md）
 - 如果用户对话中额外提供了模板内容，一并纳入分析
-- 如果 `.claude/skills/drama-text-skills/templates/` 为空且用户未提供模板，提醒用户放入模板后再继续
+- 如果模板文件夹为空且用户未额外提供，提醒用户放入模板后再继续
 - 通读所有模板后，提炼共性特征，包括但不限于：
   - **开头钩子**：用什么方式抓人？（悬念提问 / 冲突预告 / 反转让步 / 情绪共鸣）
   - **叙事节奏**：短句还是长句？几句话一个转折？
