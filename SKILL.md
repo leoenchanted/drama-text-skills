@@ -1,219 +1,270 @@
 ---
-name: drama-text-skills
-description: Retention-first 短剧解说文案生成器。从字幕/剧情简介/可选视频画面生成抖音、TikTok 风格高爽感短剧解说脚本，重点控制 3 秒钩子、高频冲突、10-20 秒爽点、打脸反转和升级节奏，并支持口语化英文翻译。触发词：短剧文案、解说脚本、爽文短剧、短剧爆款、drama copywriting。
+name: drama-text-skills-v4-0
+description: "English short drama recap scriptwriting skill. Rewrites Chinese short drama scripts, subtitles, or cleaned outlines into high-retention TikTok/Reels/YouTube Shorts English voiceover recap scripts with strong hooks, short lines, emotional escalation, localized names, villain conflict, regret, revenge/payoff, and cliffhanger endings. Trigger words: short drama recap, English recap, TikTok recap, drama copywriting, 短剧英文解说, 英文短剧文案."
 metadata:
-  tags: copywriting, short-drama, retention, subtitle, script, translation
+  tags: copywriting, short-drama, english-recap, retention, voiceover
 ---
 
-# drama-text-skills
+# drama-text-skills v4.0
 
-## 核心定位
+## Core Positioning
 
-这个 Skill 不是普通故事改写器，而是 **短视频留存节奏控制器**。生成文案时优先考虑：
+This skill writes **English short drama recap voiceover scripts** from Chinese short drama material.
 
-- 3 秒内抓住观众
-- 每 60-100 个中文字给一次刺激
-- 每 150-250 个中文字出现一次反转、打脸或升级
-- 冲突越来越大，身份越来越反差，爽点越来越密
+Do not produce a plot summary.  
+Do not translate line by line.  
+Reconstruct the story into a viral English-language recap format.
 
-把“写好故事”降级为素材整理，把“高频奖励机制”升级为核心目标。
+Default output is an English ready-to-record voiceover script with short lines, high emotional pressure, frequent twists, localized names, and an unresolved cliffhanger.
 
-如需更完整的爽点规则，读取 `references/retention-rules.md`。
+## Required Reference Loading
 
-## 触发场景
+Before writing any final recap script:
 
-当用户要求根据短剧字幕、剧情简介、视频画面生成短视频解说文案，或提到「短剧爆款」「爽文短剧」「隐藏大佬」「扮猪吃虎」「一路打脸」「短剧解说」「drama copywriting」时，使用此 Skill。
+1. Read all files in `templates/en-recap-reference/`.
+2. Read `references/english-recap-rules.md`.
+3. Use `references/retention-rules.md` only as secondary retention support.
+4. Use `templates/legacy-cn-reference/` only if the user explicitly asks for Chinese-style comparison or legacy Chinese references.
 
-## 输入
+Learn from reference scripts:
 
-用户可提供：
+- structure
+- pacing
+- short-line rhythm
+- hook placement
+- emotional escalation
+- twist placement
+- cliffhanger style
+- common transition phrases
+- recap voiceover tone
 
-1. **字幕文件**：`.txt` / SRT 风格文本均可，带时间轴更好。
-2. **剧情简介**（可选）：对话中以 `剧情简介：` 开头，或提供文件名包含 `剧情`、`简介`、`summary`、`plot` 的文本文件。
-3. **视频文件**（可选）：当对白少、画面承载剧情时使用，推荐与字幕同名。
-4. **额外风格要求**（可选）：例如更狠、更悬疑、更土味、更适合 TikTok 英文号。
+Do not copy exact sentences, paragraphs, character relationships, plot points, or names from the references.
 
-如果没有剧情简介，不要默认停下询问。只有当字幕明显来自中间集、人物关系会严重影响文案准确性时，才简短询问用户是否补充；否则基于字幕事实保守生成。
+## Inputs
 
-## 本地资源
+The user may provide any of these:
 
-- 模板目录：`templates/`
-  - 读取其中所有 `.txt` / `.md` 文件。
-  - 模板用于提炼结构、节奏、钩子和结尾套路，不要盲目复制模板里的机翻腔或病句。
-  - 如果模板为空，不要阻塞；改用 `references/retention-rules.md` 和用户要求生成，并提醒用户后续可补充爆款模板。
-- 视频辅助脚本：`scripts/video_context.py`
-  - 当字幕带时间轴且画面信息稀疏时使用。
-  - 命令：`python3 scripts/video_context.py --subtitle path/to/episode.txt --video path/to/episode.mp4`
-  - 输出的 `manifest.json`、拼图和帧图只作内部理解，不主动展示给用户。
-- 留存规则参考：`references/retention-rules.md`
-  - 当用户强调爆款、爽点、节奏、完播率、TikTok/抖音风格时读取。
+- raw Chinese script
+- dialogue-only transcript
+- cleaned Chinese plot outline
+- scene-by-scene summary
+- list of key events
+- minimal input card plus raw script
 
-## 工作流程
+User-marked fields have highest priority:
 
-分两阶段：先生成中文文案，用户确认后再翻译英文。不要自动跳到英文。
+- `最大爆点`
+- `人物关系`
+- `核心误会`
+- `女主死心点`
+- `男主追悔点`
+- `结尾卡点`
+- `必须保留设定`
 
-### 阶段一：中文文案
+Do not require the user to fill a long form. Infer missing information when reasonable. Ask follow-up questions only when relationship logic is impossible to understand.
 
-#### Step 0 - 收集上下文
+## Internal Workflow
 
-- 读取字幕全文。
-- 读取可选剧情简介。
-- 如字幕带时间轴且用户提供视频，判断字幕是否稀疏：
-  - 字幕覆盖率低、长无字幕 gap 多、单位分钟字数少时运行 `scripts/video_context.py`。
-  - 优先看 `sheets/` 拼图，必要时再看单帧。
-  - 整理内部「画面事实清单」：时间点 + 客观画面事实。
-- 所有剧情事实只能来自字幕、剧情简介、画面事实。对不确定身份和动机保持保守。
+Do all analysis internally unless the user asks for analysis.
 
-#### Step 1 - 内部剧情压缩
+### Step 1 - Understand The Chinese Material
 
-只在内部完成，不输出给用户：
+Read the full user input first. Extract:
 
-- 起因是什么
-- 谁压制谁
-- 主角的隐藏优势是什么
-- 第一处反转在哪里
-- 最大打脸点在哪里
-- 结尾悬念或下一集钩子是什么
+- drama type
+- main characters
+- heroine's pain point
+- male lead's misunderstanding or mistake
+- villain or mistress scheme
+- strongest viral element
+- biggest twist
+- best opening scene
+- truth reveal
+- male lead regret point
+- revenge or emotional payoff
+- ending cliffhanger point
 
-正常使用人物名帮助自己理解，但最终文案不能出现人物名。
+Be careful with Chinese relationship terms such as 小三, 白月光, 替身, 养女, 亲生女儿, 继母, 未婚妻, 前妻, 小叔, 舅舅, 哥哥, 养父, and 亲生父母.
 
-#### Step 2 - 识别短剧爽点类型
+If user-provided cleaned notes conflict with raw dialogue, prioritize the user's marked notes.
 
-内部判断本集主引擎，可多选：
+### Step 2 - Handle Dialogue-Only Transcripts
 
-- 隐藏大佬 / 扮猪吃虎
-- 重生复仇 / 改命
-- 闪婚霸总 / 隐婚撑腰
-- 真假千金 / 豪门身份
-- 追妻火葬场
-- 逆袭打脸 / 被羞辱后反杀
-- 灾难逃生 / 末日求生
-- 甜宠误会 / 同居拉扯
+If the input is mainly subtitles or dialogue, assume it may be missing visuals, speakers, scene changes, and actions.
 
-不同类型套用不同爽点：
+Internally reconstruct scene blocks:
 
-- 隐藏大佬：被轻视 → 露一手 → 全场震惊 → 更高身份压场
-- 重生复仇：前世背叛 → 这一世预判 → 反派入套 → 命运改写
-- 霸总撑腰：被羞辱 → 孤立无援 → 权势人物出现 → 当众反杀
-- 灾难逃生：无人相信 → 危机证据出现 → 倒计时逼近 → 生死选择
+- scene location if supported
+- characters present if supported
+- speaker ownership of important lines
+- visible actions if supported
+- emotional conflict
+- villain action
+- heroine pain point
+- male lead misunderstanding
+- story function of the scene
 
-#### Step 3 - 分析爆款模板
+Do not invent unsupported visual actions. If a speaker or location is unclear, use neutral narration such as "at that moment" instead of forcing a specific scene.
 
-读取 `templates/` 后只提炼可复用公式：
+### Step 3 - Choose The Opening Hook
 
-- 开头钩子：悬念、羞辱、背叛、反差、危险倒计时
-- 节奏密度：几句话一次转折
-- 爽点循环：压制、质疑、出手、震惊、升级、再次打脸
-- 语气：口语、狠感、旁观者解说、强情绪判断
-- 结尾：身份反转、危险逼近、下一集强悬念
+Do not follow original scene order blindly. Open with the strongest retention moment.
 
-模板是结构参考，不是质量上限。遇到模板语言别扭时，保留节奏，重写表达。
+Preferred hook types:
 
-#### Step 4 - 制作 Retention Beat Map（内部）
+- terminal illness
+- fake death
+- rebirth
+- revenge return
+- wedding humiliation
+- hidden identity reveal
+- public humiliation
+- pregnancy or paternity reveal
+- memory loss twist
+- male lead discovering the truth too late
+- heroine giving up completely
 
-写正文前，先内部规划 8-12 个节奏点：
+Use one of these opening structures when suitable:
 
-1. **3 秒钩子**：第一句必须有背叛、危险、羞辱、身份反差或不可思议结果。
-2. **刺激点**：每 60-100 个中文字至少出现一次冲突、打脸、反转、震惊、技能展示、身份反差或危险升级。
-3. **升级点**：每 150-250 个中文字提高一次赌注，比如更强对手、更大场面、更高身份、更多围观者、更严重后果。
-4. **视觉高潮**：每 200-300 个中文字安排一次可视化强画面，如当众打脸、超规格操作、全场沉默、证据甩出、怪物逼近、身份揭露。
-5. **结尾钩子**：最后 80-120 字留下身份反转、危机倒计时、关系爆点或下一集问题。
+- Truth Reveal First
+- Death or Disappearance First
+- Public Slap-in-the-Face First
+- Regret First
+- Revenge Return First
 
-Beat Map 只服务生成，不输出。
+The first line must be shocking. The first 30 seconds must include the main conflict, an emotional reason to keep watching, and at least one twist or secret.
 
-#### Step 5 - 生成中文脚本
+Never start with slow background setup, childhood, ordinary marriage life, company setup, family introduction, or slow romance unless it is immediately tied to a shocking event.
 
-**字数**：800-1000 字。
+### Step 4 - Rebuild The Story Order
 
-**输出形式**：
+A strong recap usually follows:
 
-- 必须是一整段连续文本。
-- 不分段、不编号、不加小标题。
-- 只在分隔符之间输出正文。
+1. shocking high-energy scene
+2. immediate emotional conflict
+3. short flashback explaining why it happened
+4. repeated humiliation or misunderstanding
+5. villain manipulation
+6. heroine pain point
+7. male lead makes the wrong choice
+8. truth begins to surface
+9. male lead regrets
+10. heroine refuses to forgive or disappears
+11. cliffhanger
 
-**硬性约束**：
+Compress or remove daily conversations, repeated arguments, business details with no emotional function, low-stakes dialogue, side characters with no viral purpose, and slow romance setup.
 
-- 绝对不出现人物名字，全部替换成：他、她、男人、女人、男主、女主、那个人、对方、继母、闺蜜、养子等泛称。
-- 禁止直接对话和引号。所有台词都改成第三人称转述。
-- 不写长篇背景介绍。
-- 不写慢节奏情绪戏。
-- 不连续解释超过 120 个中文字。
-- 不为了逻辑完整牺牲节奏；必要信息压缩成一句。
+Keep and amplify betrayal, misunderstanding, humiliation, sacrifice, injury, terminal illness, pregnancy, identity reversal, regret, revenge, public confrontation, emotional breaking point, final goodbye, and cliffhanger.
 
-**节奏约束**：
+### Step 5 - Localize Names
 
-- 开头 60-80 字必须直接抛出强冲突或反差。
-- 每 60-100 字必须有一个刺激点。
-- 每 150-250 字必须升级一次冲突。
-- 每个场景快速进入爽点，不写无效过门。
-- 优先采用循环：压制 → 质疑 → 主角出手 → 众人震惊 → 反派不服 → 升级挑战 → 再次打脸。
+Localize Chinese names, families, companies, hospitals, schools, and organizations into natural fictional English-speaking names.
 
-**主角约束**：
+Do not use pinyin unless the user specifically asks.  
+Do not use real celebrity names or famous real companies.  
+Keep names easy for AI voiceover and consistent throughout.
 
-- 主角要冷静、神秘、强大、情绪稳定。
-- 面对羞辱时尽量淡定，靠行动反杀。
-- 永远留有底牌。
-- 如果原剧情主角弱或慌，也要把解说重心放在其“即将反杀/已经看透/开始布局”的爽感上。
+Examples:
 
-**语言风格**：
+- 顾寒州 -> Benjamin Kingsley
+- 沈晚 -> Anna Sterling
+- 林雪 -> Linda Whitmore
+- 顾氏集团 -> Kingsley Corporation
+- 傅氏集团 -> Sterling Group
 
-- 短句为主，适合配音。
-- 口语化，有压迫感和情绪判断。
-- 多用结果前置、反差前置、悬念前置。
-- 可使用“没想到”“下一秒”“所有人都傻了”“更狠的是”“可他不知道”等短视频转折语，但不要机械堆叠。
+Do not explain name changes in the final output.
 
-#### Step 6 - 内部自检
+### Step 6 - Write The English Recap
 
-输出前检查：
+Default length:
 
-- 是否包含人物名：有则全部替换。
-- 是否包含引号或直接对话：有则改成转述。
-- 是否一整段：不是则合并。
-- 前 80 字是否有强钩子。
-- 是否存在 120 字以上纯解释/铺垫：有则压缩并插入冲突。
-- 是否有至少 5 个明确爽点。
-- 结尾是否让人想看下一集。
+- 900-1200 English words
+- 500-700 words if the user asks for short
+- 1500-2000 words if the user asks for long
 
-#### Step 7 - 输出并停止
+Voiceover rules:
 
-只输出：
+- English only.
+- Use simple, direct, dramatic English.
+- Use short lines.
+- Each line should contain one action, one reveal, or one emotion.
+- Do not write paragraphs.
+- Do not write bullet points.
+- Do not write scene headings.
+- Do not write camera directions.
+- Do not write timestamps.
+- Do not include analysis or explanations.
+- Avoid Chinese-style translated phrasing.
+- Avoid complicated grammar and literary descriptions.
 
-```text
-<<<DRAMA_SCRIPT>>>
-[中文文案脚本文本...]
-<<<END_SCRIPT>>>
-```
+Use transition phrases naturally:
 
-然后询问：`中文文案已生成，需要修改什么地方吗？确认没问题后我就翻译成英文。`
+- but he did not know
+- what he did not know was
+- only then did he realize
+- at that moment
+- the next second
+- however
+- just then
+- meanwhile
+- even worse
+- what broke her completely was
+- from that day on
+- for the first time
+- he finally understood
+- but it was already too late
+- the truth was even crueler
+- this was only the beginning
 
-如果用户要求更激烈、更悬疑、缩短、扩写、换钩子、换结尾，继续只输出中文分隔符。  
-如果用户说「最终版」「可以了」「没问题」「确认」「翻译吧」，进入阶段二。  
-如果用户发来的内容以 `<<<DRAMA_SCRIPT>>>` 开头，提取其中正文作为最终中文稿进入翻译。
+### Step 7 - Ending
 
-### 阶段二：英文翻译
+The ending must not feel fully complete. End with a cliffhanger.
 
-仅在用户确认中文稿后执行。
+Good ending patterns:
 
-要求：
+- someone suddenly appears
+- the person at the door makes everyone freeze
+- the truth is even more terrifying
+- this is only the beginning
+- the woman they thought was dead returns
+- she walks in with another man
+- he does not know she has already prepared her revenge
 
-- 不是逐字翻译，而是 TikTok / YouTube Shorts / Reels 口语化改写。
-- 保留高频刺激和强转折。
-- 英文同样不使用人物名。
-- 不使用直接引号。
-- 输出为一整段。
+Do not end with a moral lesson or a fully resolved happy ending.
 
-输出：
+### Step 8 - Self-Check
 
-```text
-<<<DRAMA_ENGLISH>>>
-[English script text...]
-<<<END_ENGLISH>>>
-```
+Before final output, check internally:
 
-## 输出分隔符规则
+1. Is the first line shocking enough?
+2. Does the first 3 seconds create curiosity?
+3. Does the first 30 seconds include a strong hook?
+4. Is the strongest viral point placed early?
+5. Are the lines short enough for voiceover?
+6. Is there a new twist or emotional beat every 20-30 seconds?
+7. Is the heroine's pain clear?
+8. Is the male lead's mistake clear?
+9. Is the villain hateable enough?
+10. Are Chinese names localized into natural English names?
+11. Is the ending a cliffhanger?
 
-1. 分隔符独占一行。
-2. 分隔符之间只放纯文本正文。
-3. 不使用 Markdown 包裹最终正文。
-4. 不在分隔符之外使用 `<<<` 前缀。
-5. 分隔符大小写必须完全一致。
+If any answer is no, rewrite before final output.
+
+## Final Output Rules
+
+Output only the English recap voiceover script.
+
+Do not include:
+
+- title
+- analysis
+- explanation
+- notes
+- bullet points
+- scene directions
+- timestamps
+- Chinese comments
+- self-evaluation
+- delimiter markers
+
+The final text should look like a ready-to-record English short drama recap script.

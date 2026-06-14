@@ -1,8 +1,101 @@
-# drama-text-skills 优化说明
+# drama-text-skills v4.0 优化说明
+
+## 2026-06-14 最新升级：英文 Recap 模式
+
+这次继续优化后，`drama-text-skills-v4-0` 已从“中文短剧文案 + 确认后英文翻译”的两阶段模式，升级为 **直接生成英文短剧 recap voiceover script**。
+
+最新默认输出：
+
+- 英文短剧解说脚本。
+- 短行 voiceover 格式。
+- 不分段成大段落。
+- 不输出标题、分析、解释、分隔符。
+- 不逐句翻译中文。
+- 根据中文素材重构故事顺序。
+- 自动本地化中文人名、家族、公司、医院、学校等名称。
+- 结尾必须保留 cliffhanger。
+
+### 新增参考文案目录
+
+新增主参考目录：
+
+```text
+templates/en-recap-reference/
+```
+
+本次导入了 12 篇英文短剧 recap 参考文案，并按题材重命名，例如：
+
+```text
+01-terminal-illness-divorce.txt
+02-blind-wife-birthday-betrayal.txt
+03-academic-betrayal-revenge.txt
+04-rebirth-give-up-toxic-love.txt
+05-pregnancy-child-betrayal.txt
+06-ninety-nine-divorces-remarriage.txt
+07-ex-wife-billionaire-reversal.txt
+08-fake-death-heart-donation.txt
+09-secret-marriage-certificate.txt
+10-blind-wife-identity-stolen.txt
+11-fire-memory-loss-regret.txt
+12-wedding-uncle-reversal.txt
+```
+
+这些文件现在是默认优先读取的参考文案。
+
+### 旧模板已归档
+
+旧的中文模板已移动到：
+
+```text
+templates/legacy-cn-reference/
+```
+
+它们不再作为英文 recap 的默认参考源，只在需要中文风格对照或 legacy 参考时使用。
+
+### 新增英文 Recap 规则文件
+
+新增：
+
+```text
+references/english-recap-rules.md
+```
+
+它沉淀了这次新增的完整英文 recap 规则：
+
+- 角色定位。
+- 参考文案学习方式。
+- 英文 voiceover 短行格式。
+- 开头 3 秒 hook 规则。
+- 前 30 秒留存规则。
+- 爆款元素优先级。
+- 故事重排规则。
+- 女主痛点、男主错误、反派冲突处理。
+- 中文人物关系理解。
+- 人名和机构名本地化。
+- dialogue-only transcript 处理。
+- 默认长度 900-1200 English words。
+- cliffhanger ending。
+- final output only script。
+
+### 核心行为变化
+
+旧模式：
+
+```text
+中文脚本 → 用户确认 → 英文翻译
+```
+
+新模式：
+
+```text
+中文素材理解 → 爆点提取 → 英文结构重构 → 英文短剧 recap 输出
+```
+
+这意味着 skill 不再把英文当作中文稿的翻译结果，而是直接生成适合 TikTok / Reels / YouTube Shorts 的英文短剧解说稿。
 
 ## 一句话总结
 
-这次优化把 `drama-text-skills` 从“根据字幕写一篇短剧解说文案”，升级成了“按短视频留存节奏强制生成高爽感爆款文案”的 skill。
+这次优化把 `drama-text-skills-v4-0` 从“根据字幕写一篇短剧解说文案”，升级成了“按短视频留存节奏强制生成高爽感爆款文案”的 skill。
 
 旧版更像：讲清楚剧情。  
 新版更像：控制观众每隔几秒获得一次刺激。
@@ -13,7 +106,6 @@
 
 - 读取短剧字幕文件。
 - 可选读取剧情简介。
-- 可选通过视频抽帧理解低字幕画面。
 - 读取 `templates/` 里的爆款文案模板。
 - 生成 800-1000 字中文解说脚本。
 - 用户确认后翻译成口语化英文。
@@ -197,11 +289,23 @@ references/retention-rules.md
 重点说明：
 
 - 这个 skill 是 retention-first。
-- 如何提供字幕、剧情简介、视频。
+- 如何提供字幕和剧情简介。
 - 模板的正确用法。
 - 中文和英文输出格式。
 - 关键节奏规则。
-- 视频抽帧工具如何手动使用。
+
+### 12. 移除视频抽帧步骤
+
+后续优化中，视频抽帧步骤已移除。
+
+原因：
+
+- 使用率不高。
+- 依赖 `ffmpeg/ffprobe`，增加维护成本。
+- 自动抽帧会让流程变重，不适合高频批量生成文案。
+- 大多数短剧文案任务只需要字幕和剧情简介即可完成。
+
+现在如果字幕对白太少，skill 会要求用户补充剧情简介或关键画面描述，而不是自动抽帧分析视频。
 
 ## 文件变化汇总
 
@@ -213,14 +317,19 @@ README.md
 references/retention-rules.md
 ```
 
-未修改：
+已移除：
 
 ```text
 scripts/video_context.py
+```
+
+未修改：
+
+```text
 templates/
 ```
 
-也就是说，这次优化集中在 prompt 工作流和文案生成逻辑，不动视频抽帧工具和现有模板素材。
+也就是说，这次优化集中在 prompt 工作流和文案生成逻辑，并进一步去掉了低使用率的视频抽帧链路。
 
 ## 优化后的预期效果
 

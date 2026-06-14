@@ -1,156 +1,165 @@
-# drama-text-skills
+# drama-text-skills v4.0
 
-Retention-first 短剧解说文案生成器。输入短剧字幕、可选剧情简介和视频，生成适合抖音 / TikTok / Reels 的高爽感解说脚本，并支持确认后翻译成口语化英文。
+English short drama recap scriptwriting skill.
 
-这个 skill 的核心不是“把故事讲完整”，而是强制控制：
+It rewrites Chinese short drama scripts, subtitles, dialogue transcripts, or cleaned outlines into high-retention English voiceover recap scripts for TikTok, Reels, and YouTube Shorts.
 
-- 3 秒钩子
-- 高频冲突
-- 每 10-20 秒一次爽点
-- 打脸、反转、震惊、身份反差
-- 越来越大的升级感
+This skill does not translate line by line.  
+It reconstructs the story around the strongest hook, emotional pressure, villain conflict, regret, revenge/payoff, and cliffhanger.
 
-## 文件结构
+## What Changed
+
+The default output is now:
+
+- English only
+- short voiceover lines
+- no paragraphs
+- no bullet points
+- no title
+- no analysis
+- localized English names
+- cliffhanger ending
+
+## File Structure
 
 ```text
 drama-text-skills/
 ├── SKILL.md
 ├── references/
+│   ├── english-recap-rules.md
 │   └── retention-rules.md
-├── scripts/
-│   └── video_context.py
 ├── templates/
-│   ├── 1.txt
-│   ├── 2.txt
-│   └── ...
+│   ├── en-recap-reference/
+│   │   ├── 01-terminal-illness-divorce.txt
+│   │   ├── 02-blind-wife-birthday-betrayal.txt
+│   │   └── ...
+│   └── legacy-cn-reference/
+│       ├── 1.txt
+│       └── ...
 └── README.md
 ```
 
-## 输入建议
+## Template Folders
 
-### 1. 字幕文件
+### `templates/en-recap-reference/`
 
-提供 `.txt` 或 SRT 风格字幕。带时间轴更好：
+Primary reference folder.
 
-```text
-1
-00:00:01,000 --> 00:00:03,000
-这里是字幕内容
-```
+These are English short drama recap samples. The skill reads them first and learns:
 
-### 2. 剧情简介（可选）
+- hook placement
+- short-line rhythm
+- emotional escalation
+- twist timing
+- cliffhanger style
+- transition phrases
+- English recap tone
 
-如果字幕来自中间集，建议在对话中粘贴：
+It should imitate the format, not copy the content.
 
-```text
-剧情简介：
-[前情、人物关系、核心矛盾]
-```
+### `templates/legacy-cn-reference/`
 
-也可以提供文件名包含 `剧情`、`简介`、`summary`、`plot` 的文本文件。
+Old Chinese reference scripts.
 
-### 3. 视频文件（可选）
+These are kept only for legacy comparison or Chinese-style reference. They are not the default reference source for English recap generation.
 
-如果对白少、很多剧情靠画面表现，把视频和字幕放在同一目录并保持同名：
+## Input
 
-```text
-episode01.mp4
-episode01.txt
-```
+The user may provide:
 
-字幕稀疏时，skill 会用 `scripts/video_context.py` 抽取关键画面辅助理解。
+- raw Chinese script
+- short drama subtitle transcript
+- dialogue-only transcript
+- cleaned Chinese plot outline
+- scene-by-scene summary
+- list of key events
+- minimal input card plus raw script
 
-## 模板
-
-把爆款短剧解说文案放入 `templates/`。推荐 8-10 篇。
-
-模板不会被机械复制。skill 会提炼：
-
-- 开头钩子
-- 爽点间隔
-- 打脸方式
-- 反转方式
-- 结尾悬念
-
-如果模板语言比较机翻，skill 会保留节奏，重写表达。
-
-如果模板为空，skill 也可以先基于内置 retention 规则生成；后续补充模板后，风格会更贴近你的账号。
-
-## 使用方式
-
-示例：
+Useful marked fields:
 
 ```text
-帮我根据这个字幕写一个短剧爆款解说文案
+最大爆点：
+人物关系：
+核心误会：
+女主死心点：
+男主追悔点：
+结尾卡点：
+必须保留设定：
 ```
 
-也可以指定方向：
+Marked fields have highest priority.
+
+## Default Workflow
+
+1. Read all English reference scripts in `templates/en-recap-reference/`.
+2. Read `references/english-recap-rules.md`.
+3. Understand the Chinese source material.
+4. Extract the heroine pain point, male lead mistake, villain scheme, biggest twist, regret point, and cliffhanger.
+5. Reorder the story around the strongest hook, not the original scene order.
+6. Localize Chinese names and institutions into natural fictional English names.
+7. Write the final English voiceover recap.
+8. Internally check whether the first 30 seconds are strong enough.
+9. If weak, rewrite before output.
+
+## Output Format
+
+Output only the final English recap script.
+
+Use short lines:
 
 ```text
-帮我写成抖音风格，高爽感，隐藏大佬一路打脸，节奏要非常快
+She took off the wedding ring
+she had worn for five years
+and said
+in another life
+she would never love him again
+Then she poured gasoline
+all over the villa
+the man used to trap her
 ```
 
-或者：
+Do not output:
 
-```text
-帮我写成 TikTok 英文号适合翻译的中文底稿，冲突密一点，结尾留强悬念
-```
+- title
+- analysis
+- explanation
+- notes
+- bullet points
+- scene headings
+- camera directions
+- timestamps
+- Chinese comments
+- delimiter markers
 
-## 工作流程
+## Length
 
-1. 读取字幕、剧情简介、可选视频画面。
-2. 内部压缩剧情事实。
-3. 判断短剧爽点类型，比如重生复仇、隐藏大佬、闪婚霸总、灾难逃生。
-4. 分析模板结构。
-5. 内部制作 Retention Beat Map。
-6. 生成 800-1000 字中文一整段文案。
-7. 等用户确认。
-8. 用户确认后再生成英文翻译。
+Default:
 
-## 中文输出格式
+- 900-1200 English words
 
-```text
-<<<DRAMA_SCRIPT>>>
-[800-1000 字中文解说文案，一整段，不使用人物名，无直接对话]
-<<<END_SCRIPT>>>
-```
+If requested:
 
-## 英文输出格式
+- short version: 500-700 words
+- long version: 1500-2000 words
 
-```text
-<<<DRAMA_ENGLISH>>>
-[口语化英文翻译，一整段，不使用人物名，无直接对话]
-<<<END_ENGLISH>>>
-```
+If the source is very long, the skill should not include everything. It should choose the most viral emotional storyline.
 
-## 关键规则
+## Key Rules
 
-- 不出现人物名，全部改成他、她、男人、女人、男主、女主、对方等泛称。
-- 不使用直接引号或完整对话。
-- 不分段，输出一整段。
-- 前 60-80 字必须有强钩子。
-- 每 60-100 字至少一个刺激点。
-- 每 150-250 字升级一次冲突。
-- 结尾必须留下悬念、身份反转或下一集爆点。
+- First line must be shocking.
+- First 30 seconds must include conflict, emotional reason to keep watching, and at least one twist.
+- Do not start with slow background setup.
+- Add a new twist or emotional beat every 20-30 seconds.
+- Make the heroine's pain clear.
+- Make the male lead's mistake obvious.
+- Make the villain hateable.
+- Put the strongest viral point early.
+- End with a cliffhanger.
+- Localize Chinese names into natural fictional English names.
 
-## 视频抽帧工具
+## Low-Context Input
 
-手动运行：
+If the transcript is dialogue-only or missing visuals, the skill reconstructs scene blocks internally.
 
-```bash
-python3 scripts/video_context.py --subtitle path/to/episode.txt --video path/to/episode.mp4
-```
-
-可选参数：
-
-```bash
-python3 scripts/video_context.py --subtitle path/to/episode.txt --video path/to/episode.mp4 --max-points 18 --gap-threshold 3.0 --out path/to/output
-```
-
-输出：
-
-- `manifest.json`：记录字幕稀疏判断、抽帧时间点和图片路径。
-- `sheets/sheet_001.jpg`：带时间戳拼图，优先用于画面理解。
-- `frames/frame_001_00-01-12.jpg`：必要时查看单帧。
-
-抽帧结果默认只给 AI 内部理解，不主动输出给用户。
+It should not invent unsupported visual actions.  
+If speaker ownership or location is unclear, it should use neutral narration instead of forcing details.
