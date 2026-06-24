@@ -1,11 +1,11 @@
 ---
-name: drama-text-skills-v4-0
+name: drama-text-skills-v4-1
 description: "English short drama recap scriptwriting skill. Rewrites Chinese short drama scripts, subtitles, or cleaned outlines into high-retention TikTok/Reels/YouTube Shorts English voiceover recap scripts with strong hooks, short lines, emotional escalation, localized names, villain conflict, regret, revenge/payoff, and cliffhanger endings. Trigger words: short drama recap, English recap, TikTok recap, drama copywriting, 短剧英文解说, 英文短剧文案."
 metadata:
   tags: copywriting, short-drama, english-recap, retention, voiceover
 ---
 
-# drama-text-skills v4.0
+# drama-text-skills v4.1
 
 ## Core Positioning
 
@@ -21,10 +21,14 @@ Default output is an English ready-to-record voiceover script with short lines, 
 
 Before writing any final recap script:
 
-1. Read all files in `templates/en-recap-reference/`.
-2. Read `references/english-recap-rules.md`.
-3. Use `references/retention-rules.md` only as secondary retention support.
-4. Use `templates/legacy-cn-reference/` only if the user explicitly asks for Chinese-style comparison or legacy Chinese references.
+1. Read `references/english-recap-rules.md`.
+2. Read `references/english-style-polish.md`.
+3. Inspect the category folders under `templates/en-recap-reference/`.
+4. Infer the story category from the user input unless the user explicitly names the category.
+5. Select 2-4 matching reference scripts from the closest category folder(s).
+6. Use `references/retention-rules.md` only as secondary retention support.
+
+Read all templates only if the user explicitly asks to reference all templates or if the source story clearly combines many categories.
 
 Learn from reference scripts:
 
@@ -60,6 +64,7 @@ User-marked fields have highest priority:
 - `男主追悔点`
 - `结尾卡点`
 - `必须保留设定`
+- requested length or duration
 
 Do not require the user to fill a long form. Infer missing information when reasonable. Ask follow-up questions only when relationship logic is impossible to understand.
 
@@ -88,7 +93,48 @@ Be careful with Chinese relationship terms such as 小三, 白月光, 替身, �
 
 If user-provided cleaned notes conflict with raw dialogue, prioritize the user's marked notes.
 
-### Step 2 - Handle Dialogue-Only Transcripts
+### Step 2 - Detect Genre And Select Templates
+
+If the user states the genre, use it.
+
+If the user does not state the genre, infer it from:
+
+- relationship logic
+- betrayal type
+- villain goal
+- heroine pain point
+- male lead mistake
+- wealth/inheritance conflict
+- child or paternity conflict
+- workplace/company conflict
+- revenge or regret engine
+
+Use the folder structure under `templates/en-recap-reference/` as the category map.
+
+Folder structure rule:
+
+- First level = broad genre/world, written as English plus Chinese note, e.g. `modern-urban（现代都市）`, `costume（古装）`, `fantasy（奇幻）`.
+- Second level = emotional engine or story engine, e.g. `marriage-betrayal（婚姻背叛）`, `revenge-face-slap（复仇打脸）`.
+
+Current active folders:
+
+- `modern-urban（现代都市）/revenge-face-slap（复仇打脸）`
+- `modern-urban（现代都市）/family-wealth（豪门家产）`
+- `modern-urban（现代都市）/workplace-counterattack（职场反击）`
+- `modern-urban（现代都市）/female-growth（女性成长）`
+- `modern-urban（现代都市）/marriage-betrayal（婚姻背叛）`
+
+Select 2-4 matching reference scripts:
+
+- First choose the broad genre folder.
+- Then choose the closest emotional-engine folder.
+- If the story crosses engines, read 1-2 related emotional-engine folders.
+- If an emotional-engine folder contains multiple templates, prefer the most topically similar filenames.
+- Do not read unrelated folders unless the user asks.
+
+Do not expose this template-selection analysis unless the user asks.
+
+### Step 3 - Handle Dialogue-Only Transcripts
 
 If the input is mainly subtitles or dialogue, assume it may be missing visuals, speakers, scene changes, and actions.
 
@@ -106,7 +152,7 @@ Internally reconstruct scene blocks:
 
 Do not invent unsupported visual actions. If a speaker or location is unclear, use neutral narration such as "at that moment" instead of forcing a specific scene.
 
-### Step 3 - Choose The Opening Hook
+### Step 4 - Choose The Opening Hook
 
 Do not follow original scene order blindly. Open with the strongest retention moment.
 
@@ -136,7 +182,7 @@ The first line must be shocking. The first 30 seconds must include the main conf
 
 Never start with slow background setup, childhood, ordinary marriage life, company setup, family introduction, or slow romance unless it is immediately tied to a shocking event.
 
-### Step 4 - Rebuild The Story Order
+### Step 5 - Rebuild The Story Order
 
 A strong recap usually follows:
 
@@ -156,7 +202,7 @@ Compress or remove daily conversations, repeated arguments, business details wit
 
 Keep and amplify betrayal, misunderstanding, humiliation, sacrifice, injury, terminal illness, pregnancy, identity reversal, regret, revenge, public confrontation, emotional breaking point, final goodbye, and cliffhanger.
 
-### Step 5 - Localize Names
+### Step 6 - Localize Names
 
 Localize Chinese names, families, companies, hospitals, schools, and organizations into natural fictional English-speaking names.
 
@@ -174,13 +220,16 @@ Examples:
 
 Do not explain name changes in the final output.
 
-### Step 6 - Write The English Recap
+### Step 7 - Write The English Recap
 
-Default length:
+Length:
 
-- 900-1200 English words
-- 500-700 words if the user asks for short
-- 1500-2000 words if the user asks for long
+- Follow the user's requested length, word count, runtime, or platform requirement when provided.
+- If the user does not specify length, choose the length based on story complexity and retention needs.
+- Do not force a fixed word count.
+- Do not add repetitive emotion or filler just to make the script longer.
+- If the source is short or thin, keep the recap tight.
+- If the source has many strong twists, allow a longer recap.
 
 Voiceover rules:
 
@@ -193,9 +242,10 @@ Voiceover rules:
 - Do not write scene headings.
 - Do not write camera directions.
 - Do not write timestamps.
-- Do not include analysis or explanations.
+- Do not include analysis or explanations inside the recap script.
 - Avoid Chinese-style translated phrasing.
 - Avoid complicated grammar and literary descriptions.
+- Apply `references/english-style-polish.md` before final output.
 
 Use transition phrases naturally:
 
@@ -216,7 +266,7 @@ Use transition phrases naturally:
 - the truth was even crueler
 - this was only the beginning
 
-### Step 7 - Ending
+### Step 8 - Ending
 
 The ending must not feel fully complete. End with a cliffhanger.
 
@@ -232,33 +282,38 @@ Good ending patterns:
 
 Do not end with a moral lesson or a fully resolved happy ending.
 
-### Step 8 - Self-Check
+### Step 9 - Quality Gate
 
-Before final output, check internally:
+Before final output, score internally from 1-5:
 
-1. Is the first line shocking enough?
-2. Does the first 3 seconds create curiosity?
-3. Does the first 30 seconds include a strong hook?
-4. Is the strongest viral point placed early?
-5. Are the lines short enough for voiceover?
-6. Is there a new twist or emotional beat every 20-30 seconds?
-7. Is the heroine's pain clear?
-8. Is the male lead's mistake clear?
-9. Is the villain hateable enough?
-10. Are Chinese names localized into natural English names?
-11. Is the ending a cliffhanger?
+- Opening Hook
+- Emotional Pressure
+- Twist Density
+- English Naturalness
+- Cliffhanger Strength
 
-If any answer is no, rewrite before final output.
+If any score is below 4, revise internally before final output.
+
+Also check:
+
+1. Does the first 3 seconds create curiosity?
+2. Does the first 30 seconds include a strong hook?
+3. Is the strongest viral point placed early?
+4. Are the lines short enough for voiceover?
+5. Is the heroine's pain clear?
+6. Is the male lead's mistake clear?
+7. Is the villain hateable enough?
+8. Are Chinese names localized into natural English names?
+
+Final output must include the script, the quality score, and a concise scoring logic explanation.
 
 ## Final Output Rules
 
-Output only the English recap voiceover script.
+Output the English recap voiceover script first, then a compact quality score section.
 
 Do not include:
 
 - title
-- analysis
-- explanation
 - notes
 - bullet points
 - scene directions
@@ -267,4 +322,16 @@ Do not include:
 - self-evaluation
 - delimiter markers
 
-The final text should look like a ready-to-record English short drama recap script.
+Use this ending format after the script:
+
+```text
+Quality Score: [overall]/5
+Opening Hook: [score]/5
+Emotional Pressure: [score]/5
+Twist Density: [score]/5
+English Naturalness: [score]/5
+Cliffhanger Strength: [score]/5
+Scoring Logic: [1-3 short English sentences explaining the opening logic, emotional escalation, twist/reveal structure, and cliffhanger.]
+```
+
+The script itself should still look like a ready-to-record English short drama recap.

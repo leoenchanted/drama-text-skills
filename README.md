@@ -1,4 +1,4 @@
-# drama-text-skills v4.0
+# drama-text-skills v4.1
 
 English short drama recap scriptwriting skill.
 
@@ -19,6 +19,9 @@ The default output is now:
 - no analysis
 - localized English names
 - cliffhanger ending
+- automatic genre detection
+- template selection by genre
+- final quality score and scoring logic
 
 ## File Structure
 
@@ -27,15 +30,16 @@ drama-text-skills/
 ├── SKILL.md
 ├── references/
 │   ├── english-recap-rules.md
+│   ├── english-style-polish.md
 │   └── retention-rules.md
 ├── templates/
-│   ├── en-recap-reference/
-│   │   ├── 01-terminal-illness-divorce.txt
-│   │   ├── 02-blind-wife-birthday-betrayal.txt
-│   │   └── ...
-│   └── legacy-cn-reference/
-│       ├── 1.txt
-│       └── ...
+│   └── en-recap-reference/
+│       └── modern-urban（现代都市）/
+│           ├── revenge-face-slap（复仇打脸）/
+│           ├── family-wealth（豪门家产）/
+│           ├── workplace-counterattack（职场反击）/
+│           ├── female-growth（女性成长）/
+│           └── marriage-betrayal（婚姻背叛）/
 └── README.md
 ```
 
@@ -43,9 +47,16 @@ drama-text-skills/
 
 ### `templates/en-recap-reference/`
 
-Primary reference folder.
+Primary and only active reference folder for v4.1.
 
-These are English short drama recap samples. The skill reads them first and learns:
+These are English short drama recap samples organized by a two-level folder structure:
+
+- First level: broad genre/world, such as `modern-urban（现代都市）`, `costume（古装）`, `fantasy（奇幻）`.
+- Second level: emotional engine, such as `marriage-betrayal（婚姻背叛）`, `revenge-face-slap（复仇打脸）`.
+
+The skill does not blindly read all templates by default. It detects the broad genre and emotional engine, then selects 2-4 matching templates from the closest folder(s).
+
+The skill learns:
 
 - hook placement
 - short-line rhythm
@@ -57,11 +68,13 @@ These are English short drama recap samples. The skill reads them first and lear
 
 It should imitate the format, not copy the content.
 
-### `templates/legacy-cn-reference/`
+To add new reference scripts later, put the file into the closest emotional-engine folder. If the topic is truly new, create a new folder using English plus Chinese note, for example:
 
-Old Chinese reference scripts.
-
-These are kept only for legacy comparison or Chinese-style reference. They are not the default reference source for English recap generation.
+```text
+costume（古装）/palace-revenge（宫斗复仇）/
+fantasy（奇幻）/rebirth（重生）/
+suspense-crime（悬疑犯罪）/hidden-truth（真相揭露）/
+```
 
 ## Input
 
@@ -85,25 +98,28 @@ Useful marked fields:
 男主追悔点：
 结尾卡点：
 必须保留设定：
+长度/时长：
 ```
 
 Marked fields have highest priority.
 
 ## Default Workflow
 
-1. Read all English reference scripts in `templates/en-recap-reference/`.
-2. Read `references/english-recap-rules.md`.
+1. Read `references/english-recap-rules.md` and `references/english-style-polish.md`.
+2. Inspect the category folders under `templates/en-recap-reference/`.
 3. Understand the Chinese source material.
-4. Extract the heroine pain point, male lead mistake, villain scheme, biggest twist, regret point, and cliffhanger.
-5. Reorder the story around the strongest hook, not the original scene order.
-6. Localize Chinese names and institutions into natural fictional English names.
-7. Write the final English voiceover recap.
-8. Internally check whether the first 30 seconds are strong enough.
-9. If weak, rewrite before output.
+4. Detect the story category from the source, unless the user specifies it.
+5. Select 2-4 matching reference templates from the closest folder(s).
+6. Extract the heroine pain point, male lead mistake, villain scheme, biggest twist, regret point, and cliffhanger.
+7. Reorder the story around the strongest hook, not the original scene order.
+8. Localize Chinese names and institutions into natural fictional English names.
+9. Write the final English voiceover recap.
+10. Run the Quality Gate and revise internally if any score is below 4.
+11. Output the script, final quality score, and scoring logic.
 
 ## Output Format
 
-Output only the final English recap script.
+Output the final English recap script first.
 
 Use short lines:
 
@@ -122,7 +138,6 @@ Do not output:
 
 - title
 - analysis
-- explanation
 - notes
 - bullet points
 - scene headings
@@ -131,16 +146,25 @@ Do not output:
 - Chinese comments
 - delimiter markers
 
+After the script, output:
+
+```text
+Quality Score: [overall]/5
+Opening Hook: [score]/5
+Emotional Pressure: [score]/5
+Twist Density: [score]/5
+English Naturalness: [score]/5
+Cliffhanger Strength: [score]/5
+Scoring Logic: [1-3 short English sentences explaining the recap logic.]
+```
+
 ## Length
 
-Default:
+The user controls length.
 
-- 900-1200 English words
+If the user gives a word count, runtime, or platform requirement, follow it.
 
-If requested:
-
-- short version: 500-700 words
-- long version: 1500-2000 words
+If the user does not specify length, the skill chooses a suitable length based on story complexity, confirmed plot information, and retention needs.
 
 If the source is very long, the skill should not include everything. It should choose the most viral emotional storyline.
 

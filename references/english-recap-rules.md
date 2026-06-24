@@ -5,6 +5,7 @@
 - Role
 - Main Goal
 - Reference Script Learning
+- Template Selection
 - Output Language
 - Voiceover Format
 - Opening Hook Rules
@@ -21,6 +22,7 @@
 - Length
 - Ending
 - Dialogue Transcript Handling
+- Quality Gate
 - Final Output
 
 ## Role
@@ -75,6 +77,41 @@ Do not copy:
 
 Imitate the format, not the content.
 
+## Template Selection
+
+Use the two-level folder structure under `templates/en-recap-reference/` before reading templates.
+
+If the user names the genre, use the matching category.
+
+If the user does not name the genre, infer it from the source material:
+
+- broad world/genre, such as modern urban, costume, fantasy, suspense crime
+- betrayal type
+- heroine pain point
+- male lead mistake
+- villain goal
+- child or paternity conflict
+- inheritance conflict
+- company or workplace conflict
+- family recognition conflict
+- wife-leaves / regret engine
+
+First choose the broad genre folder, then choose the closest emotional-engine folder.
+
+Current active examples:
+
+- `modern-urban（现代都市）/revenge-face-slap（复仇打脸）`
+- `modern-urban（现代都市）/family-wealth（豪门家产）`
+- `modern-urban（现代都市）/workplace-counterattack（职场反击）`
+- `modern-urban（现代都市）/female-growth（女性成长）`
+- `modern-urban（现代都市）/marriage-betrayal（婚姻背叛）`
+
+Read 2-4 matching templates from the closest emotional-engine folder(s).
+
+Do not read all templates unless the user asks for all references or the source combines many categories.
+
+If the user adds new templates later, they should place them inside the closest emotional-engine folder. If a new broad genre or engine appears, create a new folder using the same English + Chinese note style.
+
 ## Output Language
 
 The final recap script must be in English.
@@ -94,7 +131,7 @@ Do not write bullet points.
 Do not write scene headings.  
 Do not write camera directions.  
 Do not write timestamps.  
-Do not write explanations.
+Do not write explanations inside the recap script.
 
 Model rhythm:
 
@@ -486,11 +523,20 @@ Action and emotion should move together.
 
 ## Length
 
-Default output length:
+The user controls length.
 
-- 900-1200 English words
-- 500-700 words if shorter version requested
-- 1500-2000 words if longer version requested
+If the user provides a target word count, runtime, or platform requirement, follow it.
+
+If the user does not specify length, choose the length based on:
+
+- source complexity
+- number of strong twists
+- amount of confirmed plot information
+- desired retention pace
+
+Do not force a fixed word count.
+
+Do not add filler, repeated emotion, or low-value explanation just to make the recap longer.
 
 If the source script is very long, do not include everything. Choose the most viral emotional storyline.
 
@@ -548,15 +594,46 @@ If location is unclear, use neutral transitions.
 
 Final output should not expose uncertainty unless the user asks for analysis.
 
+## Quality Gate
+
+Before final output, score internally from 1-5:
+
+- Opening Hook
+- Emotional Pressure
+- Twist Density
+- English Naturalness
+- Cliffhanger Strength
+
+If any score is below 4, rewrite internally before final output.
+
+The final answer must include the final score and scoring logic after the script.
+
+The scoring logic should be short and should explain:
+
+- what opening logic was used
+- how emotional pressure escalated
+- where twists or reveals were placed
+- why the ending works as a cliffhanger
+
 ## Final Output
 
-Output only the English recap voiceover script.
+Output the English recap voiceover script first.
+
+After the script, output:
+
+```text
+Quality Score: [overall]/5
+Opening Hook: [score]/5
+Emotional Pressure: [score]/5
+Twist Density: [score]/5
+English Naturalness: [score]/5
+Cliffhanger Strength: [score]/5
+Scoring Logic: [1-3 short English sentences.]
+```
 
 Do not include:
 
 - title
-- analysis
-- explanation
 - notes
 - bullet points
 - scene directions

@@ -1,4 +1,148 @@
-# drama-text-skills v4.0 优化说明
+# drama-text-skills v4.1 优化说明
+
+## 2026-06-24 v4.1 内部增强：模板分类、英文润色、质量评分
+
+这次不改版本名，仍然保持：
+
+```yaml
+name: drama-text-skills-v4-1
+```
+
+但增强了 v4.1 的实际工作流。
+
+新增：
+
+```text
+references/english-style-polish.md
+```
+
+### 模板分类文件夹
+
+当前 10 篇模板已按“两层分类”放入 `templates/en-recap-reference/`。
+
+第一层是大题材/世界观，使用英文 slug + 中文括号。  
+第二层是情绪引擎/故事引擎，也使用英文 slug + 中文括号。
+
+现在 skill 使用时会：
+
+1. 先判断大题材，比如现代都市、古装、奇幻、悬疑犯罪。
+2. 再判断情绪引擎，比如婚姻背叛、复仇打脸、豪门家产、职场反击、女性成长。
+3. 如果用户指定题材，就按用户题材选模板。
+4. 如果用户没指定题材，就根据字幕/剧情自动判断。
+5. 从最接近的情绪引擎文件夹中选择 2-4 篇最相关参考模板。
+6. 不再默认盲读全部模板。
+
+当前目录结构：
+
+```text
+templates/en-recap-reference/
+└── modern-urban（现代都市）/
+    ├── revenge-face-slap（复仇打脸）/
+    ├── family-wealth（豪门家产）/
+    ├── workplace-counterattack（职场反击）/
+    ├── female-growth（女性成长）/
+    └── marriage-betrayal（婚姻背叛）/
+```
+
+后续新增模板时，直接把文案放入对应情绪引擎文件夹即可。  
+如果出现新题材，可以新增类似：
+
+```text
+costume（古装）/palace-revenge（宫斗复仇）/
+fantasy（奇幻）/rebirth（重生）/
+suspense-crime（悬疑犯罪）/hidden-truth（真相揭露）/
+```
+
+### English Polish Rules
+
+`english-style-polish.md` 用来减少机翻腔和僵硬表达。
+
+重点优化：
+
+- 减少 `after hearing this`、`at this moment`、`the woman felt very sad` 等重复表达。
+- 把平淡情绪改成更适合英文 recap 的动作和后果。
+- 控制 transition phrase 过度重复。
+- 强化女主从受伤到反击的稳定感。
+- 让旁白更像英文短剧解说，而不是中文直译。
+
+### Quality Gate
+
+新增最终质量评分机制。
+
+生成后内部评分：
+
+- Opening Hook
+- Emotional Pressure
+- Twist Density
+- English Naturalness
+- Cliffhanger Strength
+
+任意低于 4 分，先内部重写。
+
+最终输出除了脚本，还会附上：
+
+```text
+Quality Score
+Opening Hook
+Emotional Pressure
+Twist Density
+English Naturalness
+Cliffhanger Strength
+Scoring Logic
+```
+
+### 长度规则调整
+
+固定默认长度已取消。
+
+现在规则是：
+
+- 用户指定长度/字数/时长时，按用户要求。
+- 用户不指定时，根据剧情复杂度和 retention 需要自动决定。
+- 不为了凑字数重复情绪。
+- 不为了参考模板长度而强行写长。
+
+## 2026-06-24 最新升级：v4.1 模板替换
+
+这次更新把旧模板参考文案全部替换掉，只保留用户新提供的 10 篇英文 recap 参考稿。
+
+当前 active 模板目录：
+
+```text
+templates/en-recap-reference/
+```
+
+当前 v4.1 参考文案：
+
+```text
+01-swapped-daughters-inheritance-scheme.txt
+02-fathers-secret-double-family-revenge.txt
+03-best-friend-husband-affair-revenge.txt
+04-wealthy-brothers-lost-sister.txt
+05-inheritance-fight.txt
+06-company-betrayal-after-saving-business.txt
+07-woman-chooses-herself.txt
+08-mistaken-opening-husband-affair.txt
+09-cheating-husband-wife-divorce.txt
+10-chasing-wife-regret.txt
+```
+
+已移除旧参考：
+
+- v4.0 的 12 篇英文参考文案。
+- 旧的中文 legacy 模板目录。
+
+Skill 内部名称已更新为：
+
+```yaml
+name: drama-text-skills-v4-1
+```
+
+文件夹目录名保持不变，仍然是：
+
+```text
+drama-text-skills/
+```
 
 ## 2026-06-14 最新升级：英文 Recap 模式
 
